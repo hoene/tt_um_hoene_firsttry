@@ -3,6 +3,7 @@
 `include "input_shift_register.v"
 `include "low_pass_filter.v"
 `include "manchester_decoder.v"
+`include "led_pwm.v"
 
 /* This testbench just instantiates the module and makes some convenient wires
    that can be driven / tested by the cocotb test.py.
@@ -67,20 +68,39 @@ module tb ();
   );
 
   // wire up the signals of Manchester decoder
-  reg  manchester_decoder_in;
+  reg manchester_decoder_in;
   wire manchester_decoder_out_data;
   wire manchester_decoder_out_clk;
   wire manchester_decoder_out_error;
   wire [5:0] manchester_decoder_out_pulsewidth;
 
   tt_um_hoene_manchester_decoder user_manchester_decoder (
-      .in       (manchester_decoder_in),
-      .clk      (clk),                          // clock
-      .rst_n    (rst_n),                        // not reset
-      .out_data (manchester_decoder_out_data),
-      .out_clk  (manchester_decoder_out_clk),
-      .out_error(manchester_decoder_out_error),
+      .in            (manchester_decoder_in),
+      .clk           (clk),                               // clock
+      .rst_n         (rst_n),                             // not reset
+      .out_data      (manchester_decoder_out_data),
+      .out_clk       (manchester_decoder_out_clk),
+      .out_error     (manchester_decoder_out_error),
       .out_pulsewidth(manchester_decoder_out_pulsewidth)
+  );
+
+  // wire up the signals of led PWM 
+  reg [9:0] led_pwm_data_red;
+  reg [9:0] led_pwm_data_green;
+  reg [9:0] led_pwm_data_blue;
+  wire led_pwm_out_red;
+  wire led_pwm_out_green;
+  wire led_pwm_out_blue;
+
+  tt_um_hoene_led_pwm user_led_pwm (
+      .data_red  (led_pwm_data_red),
+      .data_green(led_pwm_data_green),
+      .data_blue (led_pwm_data_blue),
+      .rst_n     (rst_n),
+      .clk       (clk),
+      .out_red   (led_pwm_out_red),
+      .out_green (led_pwm_out_green),
+      .out_blue  (led_pwm_out_blue)
   );
 
 endmodule
