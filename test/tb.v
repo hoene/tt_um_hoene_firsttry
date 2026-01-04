@@ -4,6 +4,7 @@
 `include "low_pass_filter.v"
 `include "manchester_decoder.v"
 `include "led_pwm.v"
+`include "protocol_insync.v"
 
 /* This testbench just instantiates the module and makes some convenient wires
    that can be driven / tested by the cocotb test.py.
@@ -103,4 +104,34 @@ module tb ();
       .out_blue  (led_pwm_out_blue)
   );
 
+  // wire up the signals of protocol insync module
+  reg  protocol_insync_data;
+  reg  protocol_insync_clk;
+  reg  protocol_insync_error;
+  wire protocol_insync_out;
+
+  tt_um_hoene_protocol_insync user_protocol_insync (
+      .in_data (protocol_insync_data),
+      .in_clk  (protocol_insync_clk),
+      .in_error(protocol_insync_error),
+      .rst_n   (rst_n),
+      .clk     (clk),
+      .insync  (protocol_insync_out)
+  );
+  /*
+  wire [9:0] protocol_red;
+  wire [9:0] protocol_green;
+  wire [9:0] protocol_blue;
+  
+  tt_um_hoene_protocol user_protocol (
+      .in_data  (protocol_data),
+      .in_clk(protocol_clk),
+      .in_error(protocol_error),
+      .rst_n     (rst_n),
+      .clk       (clk),
+      .red   (protocol_red),
+      .green (protocol_green),
+      .blue  (protocol_blue)
+  );
+*/
 endmodule
