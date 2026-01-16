@@ -6,6 +6,7 @@
 `include "protocol_insync.v"
 `include "protocol_serial2parallel.v"
 `include "protocol_counters.v"
+`include "protocol_parity.v"
 `include "protocol_select.v"
 
 /* This testbench just instantiates the module and makes some convenient wires
@@ -151,21 +152,21 @@ module tb ();
       .test_mode  (protocol_counters_test_mode)
   );
 
+  // wire up the signals of protocol parity module
+  reg protocol_parity_in_data;
+  reg protocol_parity_in_clk;
+  reg protocol_parity_in_sync;
+  reg [4:0] protocol_parity_bits;
+  wire protocol_parity_error;
 
-  /*
-  wire [9:0] protocol_red;
-  wire [9:0] protocol_green;
-  wire [9:0] protocol_blue;
-  
-  tt_um_hoene_protocol user_protocol (
-      .in_data  (protocol_data),
-      .in_clk(protocol_clk),
-      .in_error(protocol_error),
-      .rst_n     (rst_n),
-      .clk       (clk),
-      .red   (protocol_red),
-      .green (protocol_green),
-      .blue  (protocol_blue)
+  tt_um_hoene_protocol_parity user_protocol_parity (
+      .in_data    (protocol_parity_in_data),
+      .in_clk     (protocol_parity_in_clk),
+      .in_sync    (protocol_parity_in_sync),
+      .rst_n      (rst_n),
+      .clk        (clk),
+      .bit_counter(protocol_parity_bits),
+      .error      (protocol_parity_error)
   );
-*/
+
 endmodule
