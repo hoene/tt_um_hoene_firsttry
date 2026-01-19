@@ -112,6 +112,8 @@ module tb ();
   reg  protocol_insync_clk;
   reg  protocol_insync_error;
   wire protocol_insync_out;
+  wire protocol_insync_out_data;
+  wire protocol_insync_out_clk;
 
   tt_um_hoene_protocol_insync user_protocol_insync (
       .in_data (protocol_insync_data),
@@ -119,7 +121,9 @@ module tb ();
       .in_error(protocol_insync_error),
       .rst_n   (rst_n),
       .clk     (clk),
-      .insync  (protocol_insync_out)
+      .insync  (protocol_insync_out),
+      .out_data(protocol_insync_out_data),
+      .out_clk (protocol_insync_out_clk)
   );
 
   // wire up the signals of protocol serial2parallel module

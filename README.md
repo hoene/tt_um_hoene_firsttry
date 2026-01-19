@@ -4,6 +4,63 @@
 
 iverilog -o sim_build/gl/sim.vvp -s tb -g2012 -DGL_TEST -DFUNCTIONAL -DSIM -Isrc -f sim_build/gl/cmds.f lsihp-sg13g2/libs.ref/sg13g2_io/verilog/sg13g2_io.v /home/runner/pdk/ihp-sg13g2/libs.ref/sg13g2_stdcell/verilog/sg13g2_stdcell.v /home/runner/work/tt_um_hoene_firsttry/tt_um_hoene_firsttry/test/gate_level_netlist.v /home/runner/work/tt_um_hoene_firsttry/tt_um_hoene_firsttry/test/tb.v
 
+# Architecture
+
+The architecture of the digital LED is based on a pipelined signal flow. The following modules are used
+
+*) Input Signal
+*) Low pass filter
+*) Manchester decoder
+
+## Input Selector
+The first module is the "input_selector.v". At startup, is selected either the IN0 input or IN1 input based on whether DIN shows a toggling signal. The IN0 must toggle 63 times until the input is selected. This decision is only made once after reset.
+However, if the test-mode command is send, then the input is switched from DIN to BIN or vice versa.
+The algorithmic delay is one clock cylce
+
+### Inputs and Outputs
+* IN0 (i) Data signal input from previous LED
+* INT1 (i) Data signal input from LED previous to the previous LED
+* TEST_MODE (i) True if the test_mode selected.
+* OUT (o) Data signal output
+* IN0SELECTED (o) True, if in0 is selected. Toggles with if test-mode is switched on. 
+
+## Low pass filter
+In order to avoid spikes, the low pass filter filters out spikes which have a length of one clock cycle, are removed.
+The algorithmic delay is two clock cycles
+
+### Inputs and Outputs
+* IN (i) Data signal input from input_selector's OUT
+* OUT (o) Low-pass filtered data signal output
+
+## A Manchester decoder
+The input signal is decoded according to the Manchester coding. Both the data signal and the clock signal are reconstructed. If the input signal looks strange or is missing , this is reported. We assume that the frequency of the input is about 24 times less than the internal clock signal. However, very data bit, the real length of the data is measured and reported.
+The clock tolerance ranges from -25% faster to +50% slower than the one given by the clock frequency divided by 24.
+The algorithmic delay is one clock cycle.
+If the decoder is in error state, then a long impulse is needed to reset it to good. 
+
+### Inputs and Outputs
+* IN (i) Data signal input from low pass filters's OUT
+* OUT_DATA (o) data signal bit. It is only valid while OUT_CLK is high, too.
+* OUT_CLK (o) one cycle high indicating a new OUT_DATA 
+* OUT_ERROR (o) the manchester decoding is not according to definition. It remain in error state till a good long bit is detected (e.g., a 10 bit sequences) 
+* OUT_PULSEWIDTH (o) the 6 bit length of the last bit. 
+
+## Synchronizing the beginning of a frame
+Based on the output of the Manchester decoder, the frame start is detected. The first byte of a frame must start with two ones in row (two short pulses). Before that, alternating 1 or 0 are expected (long pulses).
+It outputs a signal "insync" to indicate that the frame start has been detected and that the following data contains valid LED data.
+The algorithmic delay is one cycle.
+
+### Inputs and Outputs
+* IN_DATA (i) the bit from the Manchester decodign.
+* IN_CLK (i) the clock signal from the Manchester decoding 
+* IN_ERROR (i) The manchester decoding is in error state
+* INSYNC (o) Indicate whether the frame has started
+* OUT_DATA (o) Valid data within a frame
+* OUT_CLK (o) Valid clock within a frame
+
+
+
+
 # Tiny Tapeout Verilog Project Template
 
 - [Read the documentation for project](docs/info.md)
