@@ -90,14 +90,18 @@ module tt_um_hoene_firsttry (
   // wire up the signals of protocol counters module
   wire [4:0] protocol_counters_bits;
   wire protocol_counters_test_mode;
+  wire protocol_counters_out_clk;
+  wire protocol_counters_out_data;
 
   tt_um_hoene_protocol_counters user_protocol_counters (
       .in_clk     (protocol_insync_out_clk),
+      .in_data    (protocol_insync_out_data),
       .in_sync    (protocol_insync_out),
-      .rst_n      (rst_n),
       .clk        (clk),
       .bit_counter(protocol_counters_bits),
-      .test_mode  (protocol_counters_test_mode)
+      .test_mode  (protocol_counters_test_mode),
+      .out_data   (protocol_counters_out_data),
+      .out_clk    (protocol_counters_out_clk)
   );
 
 
@@ -110,9 +114,9 @@ module tt_um_hoene_firsttry (
 
 
   tt_um_hoene_protocol_select user_protocol_select (
-      .in_data         (manchester_decoder_out_data),
-      .in_clk          (manchester_decoder_out_clk),
-      .in_sync         (protocol_insync_out),
+      .in_data         (protocol_counters_out_data),
+      .in_clk          (protocol_counters_out_clk),
+      .in_sync         (protocol_counters_out_clk),
       .rst_n           (rst_n),
       .clk             (clk),
       .in0selected     (input_selector_in0selected),

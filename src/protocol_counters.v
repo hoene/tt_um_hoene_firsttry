@@ -8,37 +8,42 @@
 // select in the data stream which data is used for the LEDs and which data is modified if forwarded
 // also, enabled test mode
 module tt_um_hoene_protocol_counters (
-    input             in_clk,            // input clock
-    input             in_sync,           // input is valid
-    input             clk,               // global clock
-    input             rst_n,             // device reset
-    output reg [4:0]  bit_counter,
-    output reg        test_mode         // test mode is selected if too many LED data
+    input            in_clk,       // input clock
+    input            in_data,      // input data
+    input            clk,          // global clock
+    input            in_sync,      // frame started
+    output reg [4:0] bit_counter,
+    output reg       test_mode,    // test mode is selected if too many LED data
+    output reg       out_data,     // the data if within a frame delayed by one clock cycle
+    output reg       out_clk       // the clock if within a frame delayed by one clock cycle
+
 );
 
   reg [11:0] led_counter;
 
   always @(posedge clk) begin
-    if(!rst_n) begin
-    // reset
+    if (!in_sync) begin
+      // reset
       bit_counter <= 5'b0;
       led_counter <= 12'b0;
       test_mode <= 0;
-    end else if (!in_sync) begin
-      // new cycle 
-      bit_counter <= 5'b0;
-      led_counter <= 12'b0;
-    end else if(in_clk) begin
-      // increase counters. If too many LEDs received, enter test mode      
+      out_data <= 0;
+      out_clk <= 0;
+    end else begin
+      out_clk  <= in_clk;
+      out_data <= in_data;
+      if (in_clk) begin
+        // increase counters. If too many LEDs received, enter test mode      
         bit_counter <= bit_counter + 1;
         if (bit_counter == 31) begin
-            bit_counter <= 5'b0;
-            if (led_counter == 12'hFFF) begin
-              test_mode <= 1;
-            end else begin
-              led_counter <= led_counter + 1;
-            end
+          bit_counter <= 5'b0;
+          if (led_counter == 12'hFFF) begin
+            test_mode <= 1;
+          end else begin
+            led_counter <= led_counter + 1;
+          end
         end
+      end
     end
   end
 endmodule

@@ -35,14 +35,14 @@ module tt_um_hoene_manchester_decoder #(
       middle <= 0;
       out_pulsewidth <= BIT_LENGTH;
     end else if (last_in ^ in) begin
-      if (counter >= BIT_LENGTH * 0.75 && counter < BIT_LENGTH * 1.5) begin
+      if (counter >= $rtoi(BIT_LENGTH * 0.75) && counter < $rtoi(BIT_LENGTH * 1.5)) begin
         out_data <= last_in;  // we have a long impulse, always data out
         out_clk <= 1;
         out_error <= 0;
         middle <= 1;
         out_pulsewidth <= counter;
         counter <= 0;
-      end else if (counter >= BIT_LENGTH * 0.25 && counter < BIT_LENGTH * 0.75 && !out_error) begin
+      end else if (counter >= $rtoi(BIT_LENGTH * 0.25) && counter < $rtoi(BIT_LENGTH * 0.75) && !out_error) begin
         if (!middle) begin
           // second half of short pulse
           out_data <= last_in;  // data out

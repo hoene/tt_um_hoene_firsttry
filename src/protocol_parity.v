@@ -12,7 +12,6 @@ module tt_um_hoene_protocol_parity (
     input            in_clk,       // input clock
     input            in_sync,      // input is valid
     input            clk,          // global clock
-    input            rst_n,        // device reset
     input      [4:0] bit_counter,
     output reg       error         // error detected
 );
@@ -20,15 +19,13 @@ module tt_um_hoene_protocol_parity (
 
   always @(posedge clk) begin
     // reset
-    if (!rst_n || !in_sync) begin
+    if (!in_sync) begin
       parity <= 0;
       error  <= 0;
-    end
-
-    // check parity, output error
-    if (in_clk && in_sync) begin
+    end else if (in_clk) begin
       parity <= parity ^ in_data;
       if (bit_counter == 0 && parity != 0) begin
+        // check parity, output error
         error <= 1;
       end
     end

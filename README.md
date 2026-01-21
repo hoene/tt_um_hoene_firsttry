@@ -8,9 +8,11 @@ iverilog -o sim_build/gl/sim.vvp -s tb -g2012 -DGL_TEST -DFUNCTIONAL -DSIM -Isrc
 
 The architecture of the digital LED is based on a pipelined signal flow. The following modules are used
 
-*) Input Signal
-*) Low pass filter
-*) Manchester decoder
+1) Input Signal
+2) Low pass filter
+3) Manchester decoder
+4) Frame Detector Insync
+5) Bit and word counters
 
 ## Input Selector
 The first module is the "input_selector.v". At startup, is selected either the IN0 input or IN1 input based on whether DIN shows a toggling signal. The IN0 must toggle 63 times until the input is selected. This decision is only made once after reset.
@@ -58,7 +60,19 @@ The algorithmic delay is one cycle.
 * OUT_DATA (o) Valid data within a frame
 * OUT_CLK (o) Valid clock within a frame
 
+## Counting the bits of LED data and the LEDs
+The next modules counts bits of a LED data and the number of LEDs.
+The bits are used to control the next stages. If the number of LEDs reaches 4095, then the test mode is switched on.
+This block has an algorithmic delay of one clock cycle.
 
+### Inputs and Output
+* IN_DATA (i) Valid data within a frame from insync
+* IN_CLK (i) Valid clock within a frame from insync
+* INSYNC (i) if false, sets the counter back to zero, from the insync module 
+* BIT_COUNTER (o) counting the 32 bits
+* TEST_MODE (o) 4095 LEDs switches the test mode on.
+* OUT_DATA (o) data within a frame delayed by one cycle
+* OUT_CLK (o) clock within a frame delayed by one cycle
 
 
 # Tiny Tapeout Verilog Project Template

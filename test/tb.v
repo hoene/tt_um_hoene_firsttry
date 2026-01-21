@@ -143,17 +143,22 @@ module tb ();
 
   // wire up the signals of protocol counters module
   reg protocol_counters_in_clk;
+  reg protocol_counters_in_data;
   reg protocol_counters_in_sync;
   wire [4:0] protocol_counters_bits;
   wire protocol_counters_test_mode;
+  wire protocol_counters_out_data;
+  wire protocol_counters_out_clk;
 
   tt_um_hoene_protocol_counters user_protocol_counters (
       .in_clk     (protocol_counters_in_clk),
+      .in_data    (protocol_counters_in_data),
       .in_sync    (protocol_counters_in_sync),
-      .rst_n      (rst_n),
       .clk        (clk),
       .bit_counter(protocol_counters_bits),
-      .test_mode  (protocol_counters_test_mode)
+      .test_mode  (protocol_counters_test_mode),
+      .out_data   (protocol_counters_out_data),
+      .out_clk    (protocol_counters_out_clk)
   );
 
   // wire up the signals of protocol parity module
@@ -167,7 +172,6 @@ module tb ();
       .in_data    (protocol_parity_in_data),
       .in_clk     (protocol_parity_in_clk),
       .in_sync    (protocol_parity_in_sync),
-      .rst_n      (rst_n),
       .clk        (clk),
       .bit_counter(protocol_parity_bits),
       .error      (protocol_parity_error)
