@@ -13,6 +13,7 @@ The architecture of the digital LED is based on a pipelined signal flow. The fol
 ## Input Selector
 The first module is the "input_selector.v". At startup, is selects either the IN0 input or IN1 input based on whether Inß shows a toggling signal. The IN0 must toggle 63 times until the input is selected. This decision is only made once after reset. 
 However, if the test-mode command is send, then the input is switched from IN0 to IN1 or vice versa regardless of the internal selection.
+If IN1 has toggle 255 times, then the input selector does not select IN0 anymore but remains with it IN1 selection.
 The algorithmic delay is one clock cylce
 
 ### Inputs and Outputs

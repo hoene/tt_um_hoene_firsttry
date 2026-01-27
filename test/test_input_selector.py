@@ -102,3 +102,5 @@ async def test_input_selector(dut):
             dut.input_selector_in1.value = 0
             await ClockCycles(dut.clk, 2)
             assert dut.input_selector_out.value == 0
+
+        # TODO Add test for blocking the switching

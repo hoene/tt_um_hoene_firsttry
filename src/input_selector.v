@@ -20,21 +20,35 @@ module tt_um_hoene_input_selector (
     output reg in0selected  //  high if in0 is selected, otherwise in1 is selected
 );
 
-  reg [5:0] counter;
+  reg [5:0] counter0;
+  reg [7:0] counter1;
   reg last_in0;
+  reg last_in1;
 
   always @(posedge clk) begin
     if (!rst_n) begin
       in0selected <= 0;
       last_in0 <= 0;
-      counter <= 0;
+      counter0 <= 0;
+      last_in1 <= 0;
+      counter1 <= 0;
       out <= 0;
     end else begin
-      last_in0 <= in0;
-      if (last_in0 == 0 && in0 == 1 && counter != 63) begin
-        counter <= counter + 1;
+
+      // count inputs from in1
+      last_in1 <= in1;
+      if (last_in1 == 0 && in1 == 1 && counter1 != 255) begin
+        counter1 <= counter1 + 1;
       end
-      if ((counter == 63 & !testmode) || (counter != 63 & testmode)) begin
+
+      // count inputs from in0
+      last_in0 <= in0;
+      if (last_in0 == 0 && in0 == 1 && counter0 != 63 && counter1 != 255) begin
+        counter0 <= counter0 + 1;
+      end
+
+      // decide which input to select
+      if ((counter0 == 63 & !testmode) || (counter0 != 63 & testmode)) begin
         in0selected <= 1;
         out <= in0;
       end else begin
