@@ -97,5 +97,22 @@ module tt_um_hoene_firsttry (
       .out_data(protocol_insync_out_data),
       .out_clk (protocol_insync_out_clk)
   );
-  
+
+
+
+  // wire up the signals of protocol counters module
+  wire [4:0] protocol_counters_bits;
+  wire protocol_counters_out_clk;
+  wire protocol_counters_out_data;
+
+  tt_um_hoene_protocol_counters user_protocol_counters (
+      .in_clk     (protocol_insync_out_clk),
+      .in_data    (protocol_insync_out_data),
+      .in_sync    (protocol_insync_out),
+      .clk        (clk),
+      .bit_counter(protocol_counters_bits),
+      .test_mode  (protocol_counters_test_mode),
+      .out_data   (protocol_counters_out_data),
+      .out_clk    (protocol_counters_out_clk)
+  );
 endmodule
