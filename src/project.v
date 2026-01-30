@@ -17,7 +17,7 @@ module tt_um_hoene_firsttry (
 );
 
   // All output pins must be assigned. If not used, assign to 0.
-  assign uo_out[7] = 0;
+  //  assign uo_out[7] = 0;
   assign uio_out[7:6] = 0;
   assign uio_oe = 1;
 
@@ -98,8 +98,6 @@ module tt_um_hoene_firsttry (
       .out_clk (protocol_insync_out_clk)
   );
 
-
-
   // wire up the signals of protocol counters module
   wire [4:0] protocol_counters_bits;
   wire protocol_counters_out_clk;
@@ -116,5 +114,35 @@ module tt_um_hoene_firsttry (
       .test_mode  (protocol_counters_test_mode_out),
       .out_data   (protocol_counters_out_data),
       .out_clk    (protocol_counters_out_clk)
+  );
+
+  // wire up the parity module
+  // wire up the signals of protocol counters module
+  wire protocol_parity_error;
+  assign uo_out[7] = protocol_parity_error;
+
+  tt_um_hoene_protocol_parity user_protocol_parity (
+      .in_clk     (protocol_counters_out_clk),
+      .in_data    (protocol_counters_out_data),
+      .in_sync    (protocol_insync_out),
+      .clk        (clk),
+      .bit_counter(protocol_counters_bits),
+      .error      (protocol_parity_error)
+  );
+
+
+  // wire up the signals of LED select module
+  wire protocol_pwm_set;  // forwarded clock to manachester encoder
+  wire protocol_swap_forward_bit;  // swap the bit, which is forwarded
+
+  tt_um_hoene_protocol_select user_protocol_select (
+      .in_data         (protocol_counters_out_data),
+      .in_clk          (protocol_counters_out_clk),
+      .in_sync         (protocol_insync_out),
+      .rst_n           (rst_n),
+      .clk             (clk),
+      .in0selected     (input_selector_in0selected),
+      .pwm_set         (protocol_pwm_set),
+      .swap_forward_bit(protocol_swap_forward_bit)
   );
 endmodule
